@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+	<PackageReference Include="CommunityToolkit.Mvvm" />
+	<PackageReference Include="Microsoft.Extensions.Hosting" />
     <ProjectReference Include="..\Vixelia.Application\Vixelia.Application.csproj" />
     <ProjectReference Include="..\Vixelia.Contracts\Vixelia.Contracts.csproj" />
     <ProjectReference Include="..\Vixelia.Infrastructure\Vixelia.Infrastructure.csproj" />

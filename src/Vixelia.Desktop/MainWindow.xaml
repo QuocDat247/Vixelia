@@ -13,12 +13,12 @@
         <StackPanel HorizontalAlignment="Center"
                     VerticalAlignment="Center">
 
-            <TextBlock Text="Vixelia"
+            <TextBlock Text="{Binding ApplicationName}"
                        FontSize="32"
                        FontWeight="SemiBold"
                        HorizontalAlignment="Center" />
 
-            <TextBlock Text="0.1.0-alpha.1"
+            <TextBlock Text="{Binding VersionText}"
                        Margin="0,8,0,0"
                        FontSize="14"
                        Opacity="0.65"
