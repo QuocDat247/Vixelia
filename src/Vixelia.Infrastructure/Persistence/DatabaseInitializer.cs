@@ -34,10 +34,8 @@ internal sealed class DatabaseInitializer
             await _dbContextFactory.CreateDbContextAsync(
                 cancellationToken);
 
-        await dbContext.Database.OpenConnectionAsync(
+        await dbContext.Database.MigrateAsync(
             cancellationToken);
-
-        await dbContext.Database.CloseConnectionAsync();
 
         _logger.LogInformation(
             "Vixelia database initialized at {DatabasePath}.",

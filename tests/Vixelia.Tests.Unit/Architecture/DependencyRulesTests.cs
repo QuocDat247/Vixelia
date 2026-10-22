@@ -44,6 +44,48 @@ public sealed class DependencyRulesTests
             reference => reference!.Contains("Vixelia.Desktop"));
     }
 
+    [Fact]
+    public void Domain_Namespaces_Should_Not_Be_Defined_In_Outer_Projects()
+    {
+        var repositoryRoot = FindRepositoryRoot();
+        var sourceRoot = Path.Combine(repositoryRoot, "src");
+        var domainRoot = Path.GetFullPath(
+            Path.Combine(sourceRoot, "Vixelia.Domain"));
+
+        var violations = Directory
+            .EnumerateFiles(
+                sourceRoot,
+                "*.cs",
+                SearchOption.AllDirectories)
+            .Where(path => !IsBuildArtifact(path))
+            .Where(path =>
+                !Path.GetFullPath(path).StartsWith(
+                    domainRoot + Path.DirectorySeparatorChar,
+                    StringComparison.OrdinalIgnoreCase))
+            .Where(path =>
+                File.ReadAllText(path)
+                    .Contains(
+                        "namespace Vixelia.Domain",
+                        StringComparison.Ordinal))
+            .Select(path =>
+                Path.GetRelativePath(repositoryRoot, path))
+            .ToArray();
+
+        Assert.Empty(violations);
+    }
+
+    private static bool IsBuildArtifact(string path)
+    {
+        var separator = Path.DirectorySeparatorChar;
+
+        return path.Contains(
+                   $"{separator}bin{separator}",
+                   StringComparison.OrdinalIgnoreCase)
+            || path.Contains(
+                   $"{separator}obj{separator}",
+                   StringComparison.OrdinalIgnoreCase);
+    }
+
     private static string FindRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
