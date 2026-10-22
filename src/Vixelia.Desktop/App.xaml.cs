@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -24,6 +25,9 @@ public partial class App : System.Windows.Application
         builder.Services.AddSingleton<MainWindow>();
 
         _host = builder.Build();
+
+        DispatcherUnhandledException +=
+            OnDispatcherUnhandledException;
     }
 
     protected override async void OnStartup(
@@ -31,32 +35,54 @@ public partial class App : System.Windows.Application
     {
         base.OnStartup(e);
 
-        await _host.StartAsync();
+        try
+        {
+            await _host.StartAsync();
 
-        var databaseInitializer =
-            _host.Services
-                .GetRequiredService<IDatabaseInitializer>();
+            var databaseInitializer =
+                _host.Services
+                    .GetRequiredService<IDatabaseInitializer>();
 
-        await databaseInitializer.InitializeAsync();
+            await databaseInitializer.InitializeAsync();
 
-        var shellViewModel =
-            _host.Services
-                .GetRequiredService<ShellViewModel>();
+            var shellViewModel =
+                _host.Services
+                    .GetRequiredService<ShellViewModel>();
 
-        await shellViewModel.InitializeAsync();
+            await shellViewModel.InitializeAsync();
 
-        var logger =
-            _host.Services
-                .GetRequiredService<ILogger<App>>();
+            var logger =
+                _host.Services
+                    .GetRequiredService<ILogger<App>>();
 
-        logger.LogInformation(
-            "Vixelia desktop application started.");
+            logger.LogInformation(
+                "Vixelia desktop application started.");
 
-        var mainWindow =
-            _host.Services
-                .GetRequiredService<MainWindow>();
+            var mainWindow =
+                _host.Services
+                    .GetRequiredService<MainWindow>();
 
-        mainWindow.Show();
+            mainWindow.Show();
+        }
+        catch (Exception exception)
+        {
+            var logger =
+                _host.Services
+                    .GetRequiredService<ILogger<App>>();
+
+            logger.LogCritical(
+                exception,
+                "Vixelia failed during startup.");
+
+            MessageBox.Show(
+                "Vixelia could not start correctly.\n\n" +
+                "Please restart the application.",
+                "Vixelia Startup Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
+            Shutdown(-1);
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -72,5 +98,37 @@ public partial class App : System.Windows.Application
         _host.Dispose();
 
         base.OnExit(e);
+    }
+
+    private void OnDispatcherUnhandledException(
+        object sender,
+        DispatcherUnhandledExceptionEventArgs e)
+    {
+        try
+        {
+            var logger =
+                _host.Services
+                    .GetRequiredService<ILogger<App>>();
+
+            logger.LogCritical(
+                e.Exception,
+                "An unhandled desktop exception occurred.");
+        }
+        catch
+        {
+            // Avoid masking the original exception
+            // if logging itself is unavailable.
+        }
+
+        MessageBox.Show(
+            "Vixelia encountered an unexpected error.\n\n" +
+            "Please restart the application.",
+            "Vixelia",
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
+
+        e.Handled = true;
+
+        Shutdown(-1);
     }
 }
