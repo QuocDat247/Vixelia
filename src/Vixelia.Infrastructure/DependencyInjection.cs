@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Vixelia.Application.Abstractions.Persistence;
 using Vixelia.Application.Abstractions.Storage;
+using Vixelia.Infrastructure.Persistence.Repositories;
 using Vixelia.Infrastructure.Persistence;
 using Vixelia.Infrastructure.Storage;
 
@@ -24,6 +25,10 @@ public static class DependencyInjection
                 options.UseSqlite(
                     $"Data Source={paths.DatabasePath}");
             });
+
+        services.AddSingleton<
+            IProjectRepository,
+            ProjectRepository>();
 
         services.AddSingleton<
             IDatabaseInitializer,

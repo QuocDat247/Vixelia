@@ -9,21 +9,100 @@
         WindowState="Maximized"
         WindowStartupLocation="CenterScreen">
 
-    <Grid>
-        <StackPanel HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
+    <Grid Margin="32">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="24" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="32" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
+        <StackPanel Grid.Row="0">
             <TextBlock Text="{Binding ApplicationName}"
                        FontSize="32"
-                       FontWeight="SemiBold"
-                       HorizontalAlignment="Center" />
+                       FontWeight="SemiBold" />
 
             <TextBlock Text="{Binding VersionText}"
-                       Margin="0,8,0,0"
-                       FontSize="14"
-                       Opacity="0.65"
-                       HorizontalAlignment="Center" />
-
+                       Margin="0,4,0,0"
+                       FontSize="13"
+                       Opacity="0.6" />
         </StackPanel>
+
+        <Grid Grid.Row="2"
+              MaxWidth="640"
+              HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBox Grid.Column="0"
+                     MinWidth="360"
+                     Height="36"
+                     Padding="10,6"
+                     VerticalContentAlignment="Center"
+                     Text="{Binding NewProjectName,
+                                    UpdateSourceTrigger=PropertyChanged}" />
+
+            <Button Grid.Column="2"
+                    MinWidth="120"
+                    Height="36"
+                    Padding="16,6"
+                    Content="Create Project"
+                    Command="{Binding CreateProjectCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="12" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Projects"
+                       FontSize="20"
+                       FontWeight="SemiBold" />
+
+            <ListBox Grid.Row="2"
+                     ItemsSource="{Binding Projects}"
+                     BorderThickness="1"
+                     Padding="4">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}"
+                                           FontSize="16"
+                                           FontWeight="SemiBold" />
+
+                                <TextBlock Margin="0,4,0,0"
+                                           Opacity="0.6"
+                                           Text="{Binding Id}" />
+                            </StackPanel>
+
+                            <TextBlock Grid.Column="1"
+                                       Margin="24,0,0,0"
+                                       VerticalAlignment="Center"
+                                       Opacity="0.65"
+                                       Text="{Binding UpdatedAt,
+                                              StringFormat={}{0:g}}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+
+        <TextBlock Grid.Row="5"
+                   Margin="0,16,0,0"
+                   Opacity="0.65"
+                   Text="{Binding StatusMessage}" />
     </Grid>
 </Window>
